@@ -15,4 +15,8 @@ function checkVideoAvailable() {
 }
 
 console.log("Checking Availability")
-checkVideoAvailable();
+if(checkVideoAvailable()){
+
+} else {
+
+}
