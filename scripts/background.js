@@ -33,6 +33,6 @@ chrome.tabs.onActivated.addListener(async() => {
     console.log("RUN on activated");
 });
 
-chrome.tabs.onUpdated.addListener(async() => {
+chrome.tabs.onUpdated.addListener({changeInfo: {url: "*"}}, async() => {
     console.log("RUN on updated");
 });
