@@ -1,3 +1,6 @@
+
+const urlRegex = /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9]*/;
+
 function makeHttpRequest(videoid) {
 
 }
@@ -14,25 +17,21 @@ function editHTML(available) {
     }
 }
 
-function checkVideoAvailable() {
+function checkVideoAvailable(tabId, changeInfo, tabInfo) {
     //availability = false;
-    chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
-        // use `url` here inside the callback because it's asynchronous!
-        let url = tabs[0].url;
-        console.log(url);
+    // chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+    //     // use `url` here inside the callback because it's asynchronous!
+    //     let url = tabs[0].url;
+    //     console.log(url);
         
-    });
+    // });
     //editHTML(true);
+    if(changeInfo.url !== undefined){
+        console.log("Url not undefined");
+        if(changeInfo.url.match(urlRegex) != null) {
+            console.log("Youtube video found!");
+        }
+    }
 }
 
-function sum(a, b) {
-    return a + b;
-}
-
-chrome.tabs.onActivated.addListener(async() => {
-    console.log("RUN on activated");
-});
-
-chrome.tabs.onUpdated.addListener({changeInfo: {url: "*"}}, async() => {
-    console.log("RUN on updated");
-});
+chrome.tabs.onUpdated.addListener(checkVideoAvailable); 
