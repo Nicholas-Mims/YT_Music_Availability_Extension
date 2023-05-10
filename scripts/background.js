@@ -1,24 +1,25 @@
 
 const urlRegex = /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9]*/;
-const request_url = "https://music.youtube.com/youtubei/v1/player?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30";
+const request_url = "https://yt.lemnoslife.com/videos?part=music&id="
 
 function checkJson(response){
-    console.log("checking JSON");
     //videojson = JSON.parse(response);
-    //console.log(videojson.playabilityStatus.status);
+    available = response.items[0].music.available;
+    if(available == true) {
+        return true;
+    }
+    return false;
 }
 
-async function makeFetchRequest(video_id) {
-    console.log("making request: " + video_id);
-    const response = await fetch(request_url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "referer": "https://music.youtube.com/watch?v=" + video_id
-        },
-        body: {"videoId":video_id, "context":{"client":{"clientName":"WEB_REMIX", "clientVersion":"1.20230424.01.00"}}},
-    });
+async function makeOperationalApiRequest(video_id) {
 
+    const response = await fetch(request_url + video_id, {
+        method: "GET",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
     return response.json();
 }
 
@@ -36,7 +37,7 @@ function editHtml(available) {
     console.log("done");
 }
 
-function checkVideoAvailable(tab) {
+async function checkVideoAvailable(tab) {
     availability = false;
     // chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
     //     // use `url` here inside the callback because it's asynchronous!
@@ -46,7 +47,6 @@ function checkVideoAvailable(tab) {
     // });
     if(tab.url !== undefined){
         if(tab.url.match(urlRegex) != null) {
-            console.log("Youtube video found!");
 
             // //Edit YouTube HTML
             // chrome.scripting.executeScript({
@@ -59,17 +59,21 @@ function checkVideoAvailable(tab) {
             //Example url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
             id_start_index = tab.url.search(/\/watch\?v=/i);
             video_id = tab.url.substring(id_start_index + 9, id_start_index + 20);
-            response = makeFetchRequest(video_id);
-            console.log(response);
+            response = await makeOperationalApiRequest(video_id);
 
             //Check JSON For Availability
-            //availability = checkJson(response);
+            availability = checkJson(response);
         }
     }
+
+    return availability;
 }
 
 //chrome.tabs.onUpdated.addListener(checkVideoAvailable); 
 chrome.action.onClicked.addListener(async (tab) => {
-    checkVideoAvailable(tab);
-
+    if(await checkVideoAvailable(tab)){
+        console.log("Available");
+    } else {
+        console.log("Unvailable");
+    }
 });

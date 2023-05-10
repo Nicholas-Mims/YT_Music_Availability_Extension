@@ -22,10 +22,10 @@
     ],
     "host_permissions": [
         "https://www.youtube.com/*",
+        "https://yt.lemnoslife.com/*",
         "https://music.youtube.com/*"
     ],
     "background": {
-        "service_worker": "scripts/background.js",
-        "persistent": false
+        "service_worker": "scripts/background.js"
     }
 }
